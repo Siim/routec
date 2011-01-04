@@ -5,16 +5,16 @@ $site = array(
   "/" => 
   function(){
     if(func_num_args()==0){
-      echo "Hello world!";
+      include_once('view/index.tpl');
     }else{
+      header("HTTP/1.0 404 Not Found");
       echo "Page not found!";
     }
   },
   
   "/sayhello" => 
-  function($first="John",$last="Doe"){
-    echo "Hello $last, $first $last.";
-  
+  function($first="James",$last="Bond"){
+    include_once('view/sayhello.tpl');
   }
 );
 

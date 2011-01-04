@@ -44,7 +44,7 @@
   function getParams($route,$site){
     if($route_pfx = array_pop(route($site))){
 
-      if($rote_pfx!=='/'){
+      if($route_pfx!=='/'){
         $params_str = explode($route_pfx,$route);
       }
       /* index page */
