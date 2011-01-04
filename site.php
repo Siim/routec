@@ -2,18 +2,19 @@
 
 $site = array(
   
-  "/" => function(){
-    echo "Hello world!";
+  "/" => 
+  function(){
+    if(func_num_args()==0){
+      echo "Hello world!";
+    }else{
+      echo "Page not found!";
+    }
   },
   
-  "/sayhello" => function($first="John",$last="Doe"){
+  "/sayhello" => 
+  function($first="John",$last="Doe"){
     echo "Hello $last, $first $last.";
   
-  },
-
-  "default" => function(){
-    echo "error! page not found!";
   }
-
 );
 

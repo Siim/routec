@@ -8,7 +8,7 @@
     $params = getParams(getCurrentRoute(),$site); 
     eval("\$controller($params);");
   }else{
-    $site['default']();
+    /* TODO: log internal error */
   }
 
   /**
@@ -18,13 +18,9 @@
    * @return array Array of all matches or only last match by default
    */
   function route($routes){
-    $res = array_filter(array_keys($routes),function($el){
-      if(isprefixOf($el,getCurrentRoute())){
-        return $el;
-      }
+    return array_filter(array_keys($routes),function($el){
+      if(isprefixOf($el,getCurrentRoute()))return $el;
     });
-
-    return $res;
   }
 
   /** Checks if a string is prefix of other string */
@@ -47,8 +43,15 @@
    */
   function getParams($route,$site){
     if($route_pfx = array_pop(route($site))){
-      $params_str = explode($route_pfx,$route);
-      
+
+      if($rote_pfx!=='/'){
+        $params_str = explode($route_pfx,$route);
+      }
+      /* index page */
+      else{
+        $params_str = $route;
+      }
+
       if(isset($params_str[1])){
         /* array to string */
         return implode(',',
@@ -68,3 +71,4 @@
 
     return "";
   }
+
