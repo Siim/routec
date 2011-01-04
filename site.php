@@ -12,6 +12,7 @@ $site = array(
     }
   },
   
+  /* e.g. http://site/sayhello/John/Doe */
   "/sayhello" => 
   function($first="James",$last="Bond"){
     include_once('view/sayhello.tpl');
