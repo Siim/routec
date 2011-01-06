@@ -12,8 +12,8 @@
   }
 
   /**
-   * Lookup routes by comapring site prefix against route. 
-   * The longest prefix wins (it is the last element of result array).
+   * Lookup routes by comapring site prefix against a route. 
+   * The longest prefix wins (it is the last element of the result array).
    * @param routes Array of routes (site array used to define routes)
    * @return array Array of all matches
    */
