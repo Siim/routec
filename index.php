@@ -12,10 +12,10 @@
   }
 
   /**
-   * Get current route
-   * @param current_route Current route
-   * @param last Return only last route
-   * @return array Array of all matches or only last match by default
+   * Lookup routes by comapring site prefix against longer route. 
+   * The longest prefix wins (it is the last element of result array).
+   * @param routes Array of routes (site array used to define routes)
+   * @return array Array of all matches
    */
   function route($routes){
     return array_filter(array_keys($routes),function($el){
@@ -29,7 +29,7 @@
   }
 
   /** 
-   * Get request uri
+   * Request uri
    * @return string
    */
   function getCurrentRoute(){
@@ -37,8 +37,10 @@
   }
 
   /**
-   * Get route params on order, e.g. /foo/bar/$param
-   * @param route Current route
+   * Get route params on order, e.g. /foo/$param1/$param2 
+   * returns a string of "param1_value,param2_value", later
+   * we can pass these parameters to a handler
+   * @param route Current route path
    * @return string
    */
   function getParams($route,$site){
@@ -69,6 +71,7 @@
       }
     }
 
+    /* No params... So we return an empty string */
     return "";
   }
 
