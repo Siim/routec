@@ -1,6 +1,7 @@
 <?php
   
   require_once 'site.php';
+  session_start();
 
   $controller = $site[array_pop(route($site))];
 
