@@ -1,7 +1,10 @@
-Example php router
+PHP URL router
 ------------------
 
 How to use:
   - copy site.php and index.php to root dir
   - redirect all requests to index.php (route.conf is example lighttpd config file)
   - see site.php file
+
+Examples:
+  - see different branches
