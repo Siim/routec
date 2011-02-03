@@ -6,23 +6,17 @@
   $usr = scanModules('usr/');
   $site = array();
 
-  /* get all modules that will be loaded from sys dir */
-  $sys_modules = array_diff($sys,$usr);
+  /* prepare all sys modules */
+  $load_sys = prepareModules('sys/',$sys);
 
-  /* get all modules that will be overridded */
-  $usr_modules = array_diff($usr,$sys);
-
-  /* load all sys modules */
-  $load_sys = prepareModules('sys/',$sys_modules);
-
-  /* load all overridden modules */
-  $load_usr = prepareModules('usr/',$usr_modules);
+  /* prepare all usr modules */
+  $load_usr = prepareModules('usr/',$usr);
   
   $all_modules = array_merge($load_sys,$load_usr);
 
-  
+  /* include modules in global scope! */
   foreach($all_modules as $module){
-    if($module['module'])include_once($module['filename']);
+    if(isset($module['module']))include_once($module['filename']);
   }
 
   session_start();
@@ -34,25 +28,34 @@
       $params = getParams(getCurrentRoute(),$site); 
       eval("\$controller($params);");
     }else{
-      /* TODO: log internal error */
+      header("HTTP/1.0 500 Internal Error");
     }
   }
 
-  /* first defined route wins. be careful! */
+  /** Overridded route wins! */
   function site($routes){
-    $GLOBALS['site'] = array_merge($GLOBALS['site'],$routes);
+    //all unique keys from original
+    $unique_sys = array_diff_key($GLOBALS['site'],$routes);
+    
+    //duplicate keys
+    $override = array_intersect_key($routes,$GLOBALS['site']);
+    
+    //unique keys from routes
+    $unique_usr = array_diff_key($routes,$GLOBALS['site']);
+    $GLOBALS['site'] = array_merge($unique_sys,$override,$unique_usr);
   }
 
   /* prepare all modules for loading */
   function prepareModules($pfx,$modules){
     return array_map(function($module) use ($pfx) {
       $file = ($pfx . $module . '/' . 'site.php');
-      /* module loaded */
-      if(file_exists($file)){
+      $disabled = ($pfx . $module . '/' . 'disabled');
+      /* module loaded; if disabled file is in the dir, then module is disabled! */
+      if(file_exists($file) && !file_exists($disabled)){
         return array('module' => $module ,'filename' => $file);
       }
 
-      return array('module' => false, 'filename' => '');
+      return array();
     },$modules);
   }
 
@@ -137,3 +140,6 @@
     return "";
   }
 
+  function render($template){
+  
+  }
