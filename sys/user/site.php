@@ -14,7 +14,11 @@ Database::$db = Database::$conn->site;
 
 
 /* Site routes */
-$site = array(
+
+/* merge order is important when overriding routes !! */
+array_merge($site,$mysite);
+
+$mysite = array(
   
   
   '/' => 

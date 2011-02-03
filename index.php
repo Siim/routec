@@ -4,16 +4,17 @@
 
   $sys = scanModules('sys/');
   $usr = scanModules('usr/');
-  
+  $site = array();
+
   /* get all modules that will be loaded from sys dir */
-  $sys_modules = array_intersect($usr,$sys);
+  $sys_modules = array_diff($sys,$usr);
 
   /* get all overridden modules */
   $usr_modules = array_intersect($sys,$usr);
 
   /* load all sys modules */
   loadModules('sys/',$sys_modules);
-  
+
   /* load all overridden modules */
   loadModules('usr/',$usr_modules);
 
@@ -34,9 +35,6 @@
   function loadModules($pfx,$modules){
     return array_map(function($module) use ($pfx) {
       $file = ($pfx . $module . '/' . 'site.php');
-
-      echo $file . PHP_EOL;
-
       /* module loaded */
       if(file_exists($file)){
         include_once($file);
