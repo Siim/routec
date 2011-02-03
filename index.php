@@ -1,15 +1,69 @@
 <?php
   
-  require_once 'site.php';
+  /* Scan sys and usr dirs for modules, usr dir same module always overrides sys */
+
+  $sys = scanModules('sys/');
+  $usr = scanModules('usr/');
+  
+  /* get all modules that will be loaded from sys dir */
+  $sys_modules = array_intersect($usr,$sys);
+
+  /* get all overridden modules */
+  $usr_modules = array_intersect($sys,$usr);
+
+  /* load all sys modules */
+  loadModules('sys/',$sys_modules);
+  
+  /* load all overridden modules */
+  loadModules('usr/',$usr_modules);
+
   session_start();
 
-  $controller = $site[array_pop(route($site))];
+  if(isset($site)&&!empty($site)){
+    $controller = $site[array_pop(route($site))];
 
-  if(is_callable($controller)){
-    $params = getParams(getCurrentRoute(),$site); 
-    eval("\$controller($params);");
-  }else{
-    /* TODO: log internal error */
+    if(is_callable($controller)){
+      $params = getParams(getCurrentRoute(),$site); 
+      eval("\$controller($params);");
+    }else{
+      /* TODO: log internal error */
+    }
+  }
+
+  /* load all modules */
+  function loadModules($pfx,$modules){
+    return array_map(function($module) use ($pfx) {
+      $file = ($pfx . $module . '/' . 'site.php');
+
+      echo $file . PHP_EOL;
+
+      /* module loaded */
+      if(file_exists($file)){
+        include_once($file);
+        return array($module => true);
+      }
+
+      return array($module => false);
+    },$modules);
+  }
+
+  /** Scans modules from specified dirs */
+  function scanModules($dir){
+    $cwd = getcwd();
+    chdir($dir);
+    $contents = scandir('./');
+    $dirs = getDirs($contents);
+    chdir($cwd);
+    return $dirs;
+  }
+
+  /**
+   * Get all dirs in a path
+   */
+  function getDirs($arr){
+    return array_filter($arr,function($el){
+      return is_dir($el) && $el != '.' && $el != '..';
+    });
   }
 
   /**
