@@ -9,14 +9,21 @@
   /* get all modules that will be loaded from sys dir */
   $sys_modules = array_diff($sys,$usr);
 
-  /* get all overridden modules */
-  $usr_modules = array_intersect($sys,$usr);
+  /* get all modules that will be overridded */
+  $usr_modules = array_diff($usr,$sys);
 
   /* load all sys modules */
-  loadModules('sys/',$sys_modules);
+  $load_sys = prepareModules('sys/',$sys_modules);
 
   /* load all overridden modules */
-  loadModules('usr/',$usr_modules);
+  $load_usr = prepareModules('usr/',$usr_modules);
+  
+  $all_modules = array_merge($load_sys,$load_usr);
+
+  
+  foreach($all_modules as $module){
+    if($module['module'])include_once($module['filename']);
+  }
 
   session_start();
 
@@ -31,17 +38,21 @@
     }
   }
 
-  /* load all modules */
-  function loadModules($pfx,$modules){
+  /* first defined route wins. be careful! */
+  function site($routes){
+    $GLOBALS['site'] = array_merge($GLOBALS['site'],$routes);
+  }
+
+  /* prepare all modules for loading */
+  function prepareModules($pfx,$modules){
     return array_map(function($module) use ($pfx) {
       $file = ($pfx . $module . '/' . 'site.php');
       /* module loaded */
       if(file_exists($file)){
-        include_once($file);
-        return array($module => true);
+        return array('module' => $module ,'filename' => $file);
       }
 
-      return array($module => false);
+      return array('module' => false, 'filename' => '');
     },$modules);
   }
 
@@ -55,9 +66,7 @@
     return $dirs;
   }
 
-  /**
-   * Get all dirs in a path
-   */
+  /** Get all dirs in a path */
   function getDirs($arr){
     return array_filter($arr,function($el){
       return is_dir($el) && $el != '.' && $el != '..';

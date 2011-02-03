@@ -14,11 +14,7 @@ Database::$db = Database::$conn->site;
 
 
 /* Site routes */
-
-/* merge order is important when overriding routes !! */
-array_merge($site,$mysite);
-
-$mysite = array(
+site(array(
   
   
   '/' => 
@@ -63,20 +59,24 @@ $mysite = array(
     $_SESSION['user']->logout();
     header("location: /");
   }
-);
+));
 
 
 /*------------------------------------
  * Login dependencies 
  *-----------------------------------*/
-interface UserIf{
+
+/* All these methods are required to deal with user */
+interface UserContract{
   function __construct($username,$password);
   public function login();
   public function logout();
+  public static function get();
+  public static function create();
 }
 
 /** User login mongodb example */
-class User implements UserIf{
+class User implements UserContract{
   protected $username;
   protected $password;
   protected $loggedin;
