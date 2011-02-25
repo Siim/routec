@@ -1,7 +1,7 @@
 <?php
 
 /* If you want to disable the module, just write return to the beginning of the file */
-site(array(
+return;site(array(
 
   '/logout' => 
 
