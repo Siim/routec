@@ -5,7 +5,7 @@
 <body>
 
 <?php if($user->isLoggedIn()): ?>
-<strong>yay. you are in!</strong>
+<strong><?= Language::translate('yay') ?>.. you are in!</strong>
 <a href="/logout">logout</a>
 <?php else: ?>
 <form method="post" action="/login">

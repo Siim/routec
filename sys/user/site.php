@@ -1,17 +1,4 @@
 <?php
-/* User login and logout example with mongodb */
-
-/* Database connection settings */
-class Database{
-  public static $conn;
-  public static $db;
-
-}
-
-/* Setup connection */
-Database::$conn = new Mongo();
-Database::$db = Database::$conn->site;
-
 
 /* Site routes */
 site(array(
@@ -21,8 +8,11 @@ site(array(
   
   function(){
     if(func_num_args()==0){
-      $user = User::get();
-      include_once('view/index.tpl');
+    
+      $page = new Page();
+      $page->user = User::get();
+      $page->render('user/index.tpl');
+    
     }else{
       header("HTTP/1.0 404 Not Found");
       echo "Page not found!";
@@ -58,7 +48,15 @@ site(array(
   function(){
     $_SESSION['user']->logout();
     header("location: /");
+  },
+
+  '/language' => 
+
+  function($lang){
+    $_SESSION['language'] = $lang;
+    Page::redirect('/');
   }
+
 ));
 
 
