@@ -1,0 +1,4 @@
+every module hast following struct: 
+  module/
+    name/
+      site.php (routes go here) everything else is up to dev...

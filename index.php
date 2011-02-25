@@ -1,14 +1,79 @@
 <?php
   
-  require_once 'site.php';
+  /* Scan sys and usr dirs for modules, usr dir same module always overrides sys */
 
-  $controller = $site[array_pop(route($site))];
+  $sys = scanModules('sys/');
+  $usr = scanModules('usr/');
+  $site = array();
 
-  if(is_callable($controller)){
-    $params = getParams(getCurrentRoute(),$site); 
-    eval("\$controller($params);");
-  }else{
-    /* TODO: log internal error */
+  /* prepare all sys modules */
+  $load_sys = prepareModules('sys/',$sys);
+
+  /* prepare all usr modules */
+  $load_usr = prepareModules('usr/',$usr);
+  
+  $all_modules = array_merge($load_sys,$load_usr);
+
+  /* include modules in global scope! */
+  foreach($all_modules as $module){
+    if(isset($module['module']))include_once($module['filename']);
+  }
+
+  session_start();
+
+  if(isset($site)&&!empty($site)){
+    $controller = $site[array_pop(route($site))];
+
+    if(is_callable($controller)){
+      $params = getParams(getCurrentRoute(),$site); 
+      eval("\$controller($params);");
+    }else{
+      header("HTTP/1.0 500 Internal Error");
+    }
+  }
+
+  /** Overridded route wins! */
+  function site($routes){
+    //all unique keys from original
+    $unique_sys = array_diff_key($GLOBALS['site'],$routes);
+    
+    //duplicate keys
+    $override = array_intersect_key($routes,$GLOBALS['site']);
+    
+    //unique keys from routes
+    $unique_usr = array_diff_key($routes,$GLOBALS['site']);
+    $GLOBALS['site'] = array_merge($unique_sys,$override,$unique_usr);
+  }
+
+  /* prepare all modules for loading */
+  function prepareModules($pfx,$modules){
+    return array_map(function($module) use ($pfx) {
+      $file = ($pfx . $module . '/' . 'site.php');
+      $disabled = ($pfx . $module . '/' . 'disabled');
+      /* module loaded; if disabled file is in the dir, then module is disabled! */
+      if(file_exists($file) && !file_exists($disabled)){
+        return array('module' => $module ,'filename' => $file);
+      }
+
+      return array();
+    },$modules);
+  }
+
+  /** Scans modules from specified dirs */
+  function scanModules($dir){
+    $cwd = getcwd();
+    chdir($dir);
+    $contents = scandir('./');
+    $dirs = getDirs($contents);
+    chdir($cwd);
+    return $dirs;
+  }
+
+  /** Get all dirs in a path */
+  function getDirs($arr){
+    return array_filter($arr,function($el){
+      return is_dir($el) && $el != '.' && $el != '..';
+    });
   }
 
   /**
@@ -75,3 +140,6 @@
     return "";
   }
 
+  function render($template){
+  
+  }
