@@ -1,3 +1,6 @@
+ROUTEC - easy way to route url's
+--------------------------------
+
 Directory structure
 
 sys/
@@ -27,6 +30,15 @@ site(array(
 
   function(){
     echo "mail me foo@example.com";
+  },
+
+  '/sayhello' =>
+
+  function($first='',$last=''){
+
+    if(isset($first, $last))
+      echo "Hello $last! I mean $first."
+  
   }
 
 ));
@@ -34,9 +46,10 @@ site(array(
 will generate the following url's
   http://site/about
   http://site/contact
+  http://site/hello/?/? [e.g. http://site/hello/John/Doe]
 
-all routes in /usr dir will override /sys routes, so be careful!
-because of that nice feature, it is really easy to extend core functionality without
+All routes in /usr dir will override /sys routes, so be careful!
+Because of that nice feature, it is really easy to extend core functionality without
 the need to re-implement or copy-paste core code - just re-implement the routes you want
 and extend the classes you need.
 
@@ -44,5 +57,3 @@ How to use:
   - redirect all requests to index.php (route.conf is example lighttpd config file)
   - see site.php file
 
-Examples:
-  - see different branches
