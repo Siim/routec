@@ -1,4 +1,0 @@
-<?php
-
-$_lng = array();
-

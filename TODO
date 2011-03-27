@@ -1,6 +1,0 @@
-- replace simple translation syste with gettext
-- templates system???
-- every module hast following struct: 
-  module/
-    name/
-      site.php (routes go here) everything else is up to dev...
