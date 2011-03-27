@@ -58,7 +58,7 @@ site(array(
   
   },function(){
     // fail function
-  });
+  }),
 
 ));
 
