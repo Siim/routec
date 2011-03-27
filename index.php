@@ -2,11 +2,18 @@
 
 include_once('objects.php');
 
+<<<<<<< HEAD
 
 /* Setup mongo database */
 Database::$conn = new Mongo();
 Database::$db = Database::$conn->site;
 $conf = Database::$db->config->findOne();
+=======
+/* Production or dev mode? */
+define('PRODUCTION',false);
+
+$conf = array();
+>>>>>>> 33d2327489d41cc5724aac5b6fc640b18b3c5c6c
 
 /* Setup theme */
 if(!empty($conf)){
@@ -32,6 +39,7 @@ foreach($all_modules as $module){
   if(isset($module['module']))include_once($module['filename']);
 }
 
+<<<<<<< HEAD
 session_start();
 
 /* Setup language */
@@ -41,13 +49,31 @@ if(isset($_SESSION['language'])){
   include_once('languages/' . $_SESSION['language'] . '.php');
 }else{
   include_once('languages/english.php');  
+=======
+if(!isset($_SESSION))session_start();
+
+/* Setup language */
+$_lng = array();
+
+if(isset($_COOKIE['language'])){
+  include_once('languages/' . $_COOKIE['language'] . '.php');
+  Language::set($_COOKIE['language']);
+}elseif(isset($_SESSION['language'])){
+  include_once('languages/' . $_SESSION['language'] . '.php');
+  Language::set($_SESSION['language']);
+}else{
+  include_once('languages/estonian.php');  
+>>>>>>> 33d2327489d41cc5724aac5b6fc640b18b3c5c6c
 }
 
 Language::$translation = $_lng;
 
 if(isset($site)&&!empty($site)){
   $controller = $site[array_pop(route($site))];
+<<<<<<< HEAD
 
+=======
+>>>>>>> 33d2327489d41cc5724aac5b6fc640b18b3c5c6c
   if(is_callable($controller)){
     $params = getParams(getCurrentRoute(),$site); 
     eval("\$controller($params);");
@@ -67,6 +93,10 @@ function site($routes){
   //unique keys from routes
   $unique_usr = array_diff_key($routes,$GLOBALS['site']);
   $GLOBALS['site'] = array_merge($unique_sys,$override,$unique_usr);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 33d2327489d41cc5724aac5b6fc640b18b3c5c6c
 }
 
 /* prepare all modules for loading */
@@ -108,9 +138,30 @@ function getDirs($arr){
  * @return array Array of all matches
  */
 function route($routes){
+<<<<<<< HEAD
   return array_filter(array_keys($routes),function($el){
     if(isprefixOf($el,getCurrentRoute()))return $el;
   });
+=======
+  $filtered = array_filter(array_keys($routes),function($el){
+    if(isPrefixOf(lastslash($el) ,lastslash(getCurrentRoute())))return $el;
+  });
+
+  usort(
+    $filtered,
+
+    /* Custom sort function */
+    function($a,$b){
+      $len1 = strlen($a);
+      $len2 = strlen($b);
+
+      if($len1 == $len2) return 0;
+      return ($len1 < $len2)? -1: 1;
+    }
+  );
+
+  return $filtered;
+>>>>>>> 33d2327489d41cc5724aac5b6fc640b18b3c5c6c
 }
 
 /** Checks if a string is prefix of other string */
@@ -123,7 +174,25 @@ function isPrefixOf($needle,$haystack){
  * @return string
  */
 function getCurrentRoute(){
+<<<<<<< HEAD
   return $_SERVER['REQUEST_URI'];
+=======
+  return substr($_SERVER['REQUEST_URI'],strlen(PREFIX));
+}
+
+/** 
+ * Add last slash to uri if it is missing 
+ * @param $el A string
+ * @return string A string with slash in the end
+ */
+function lastslash($el){
+  
+  if(substr($el,-1) != '/'){
+    return $el . '/';
+  }
+
+  return $el;
+>>>>>>> 33d2327489d41cc5724aac5b6fc640b18b3c5c6c
 }
 
 /**
@@ -166,7 +235,45 @@ function getParams($route,$site){
   return "";
 }
 
+<<<<<<< HEAD
+=======
+/* URL with prefix */
+function url($url){
+  return PREFIX . $url;
+}
+
+function redirect($path){
+  header('location: ' . PREFIX . $path);
+}
+
+function goback(){
+  header('location: ' . $_SERVER['HTTP_REFERER']);
+}
+
+
+>>>>>>> 33d2327489d41cc5724aac5b6fc640b18b3c5c6c
 /** Shortcut to Language::translate() */
 function abc($text){
   return Language::translate($text);
 }
+<<<<<<< HEAD
+=======
+
+/* Frequently used admin check */
+function adminDo($fun, $fail=true){
+
+  if($fail===true)$fail = function(){
+    header('HTTP/1.0 404 Not Found');
+    Page::get()->render('404.tpl');
+  };
+
+  if(!isset($_SESSION))session_start();
+
+  if(class_exists('User')){
+    if(User::get()->isAdmin()){
+      return $fun;
+    }
+  }
+  return $fail;
+}
+>>>>>>> 33d2327489d41cc5724aac5b6fc640b18b3c5c6c
