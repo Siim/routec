@@ -1,0 +1,126 @@
+DOCUMENTATION
+--------------
+
+Directory structure
+
+sys/
+  module/
+    site.php
+
+usr/
+  module/
+    site.php
+
+lib/
+
+themes/
+  default/
+  layout.tpl (required)
+
+
+sys directory contains all system/core modules
+usr directory contains all user/custom modules
+
+TODO: move layout.tpl to theme/default/template dir
+----
+
+IMPORTANT! protect templates directory
+
+site.php file contains site routes, e.g
+
+site(array(
+  
+  '/about' =>
+
+  function(){
+    echo "about this site...";
+  },
+
+  '/contact' =>
+
+  function(){
+    echo "mail me foo@example.com";
+  },
+
+  '/sayhello' =>
+
+  function($first='',$last=''){
+
+    if(isset($first, $last))
+      echo "Hello $last! I mean $first."
+  
+  },
+
+  '/adminpage' =>
+
+  adminDo(function($param1,$param2, ...){
+    // only admin can see this
+  
+  },function(){
+    // fail function
+  });
+
+));
+
+will generate the following url's
+  http://site/about
+  http://site/contact
+  http://site/hello/?/? [e.g. http://site/hello/John/Doe]
+  http://site/adminpage/?/?
+
+All routes in /usr dir will override /sys routes, so be careful!
+Because of that nice feature, it is really easy to extend core functionality without
+the need to re-implement or copy-paste core code - just re-implement the routes you want
+and extend the classes you need.
+
+How to use:
+  - Redirect all requests to index.php (route.conf is example lighttpd config file)
+
+
+
+Data objects with mysql PDO
+---------------------------
+
+Here is genaral patternt how to create data objects.
+
+1) Optional interface for some class
+   e.g. User extends UserContract 
+
+2) Write a class for data object
+example:
+
+class User{
+  public fucntion getAllUsers(){
+    $datbase = Database::get();
+    //datbase specific operations
+  }
+}
+
+3) Use class constructor to generate table(s)
+
+class User{
+
+  public function __construct(){
+    $database = Database::get();
+
+    // mysql example. create table using current class's name 
+    // optionally you can add if($production) if you want to avoid creating tables
+    // in production server
+
+    $db->query(
+      'CREATE TABLE IF NOT EXISTS ' . __class__ . '(
+        id INT NOT NULL AUTO_INCREMENT,
+        username text,
+        password text,
+        PRIMARY KEY(id));'
+
+       'CREATE TABLE IF NOT EXISTS ' . __class__ . '_' . 'address' . '(
+         id INT ....,
+         street text,
+         ..., 
+      
+      )'
+    );
+  }
+
+}
