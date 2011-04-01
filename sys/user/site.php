@@ -119,18 +119,16 @@ class User extends DataItem{
      ));
 
      $res = $query->fetch(PDO::FETCH_ASSOC);
-
-     if($res['username'] == $this->username && $res['password'] == $this->password){
-       $this->loggedin = true;
-
-       if($res['admin']){
-         $this->admin = true;
+     if(!empty($res)){
+       if($res['username'] == $this->username && $res['password'] == $this->password){
+         $this->loggedin = true;
+         if($res['admin']){
+           $this->admin = true;
+         }
+         return true;
        }
-
-       return true;
-     }else{
-       return false;
      }
+     return false;
   }
 
   public function isLoggedIn(){
